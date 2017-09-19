@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -48,7 +49,7 @@ public final class ExcelUtil {
 		sheet.createRow(1);
 	}
 
-	public static ByteArrayResource writeWorkbookContents(final SXSSFWorkbook workbook) {
+	public static ByteArrayResource writeWorkbookContents(final Workbook workbook) {
 		ByteArrayOutputStream data = new ByteArrayOutputStream();
 
 		try {

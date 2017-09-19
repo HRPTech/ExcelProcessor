@@ -1,5 +1,7 @@
 package com.excel.helper;
 
+import java.math.BigDecimal;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -46,6 +48,8 @@ public final class SpreadsheetCellHelper {
 			setValue(cell, (Integer) value);
 		} else if (value instanceof Enum) {
 			setValue(cell, value.toString());
+		} else if (value instanceof BigDecimal) {
+			setValue(cell, ((BigDecimal) value).doubleValue());
 		}
 	}
 
@@ -61,6 +65,10 @@ public final class SpreadsheetCellHelper {
 	}
 
 	private static void setValue(final Cell cell, final Integer value) {
+		cell.setCellValue(value);
+	}
+	
+	private static void setValue(final Cell cell, final Double value) {
 		cell.setCellValue(value);
 	}
 

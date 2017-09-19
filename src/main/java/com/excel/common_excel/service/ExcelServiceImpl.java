@@ -45,14 +45,17 @@ public class ExcelServiceImpl implements ExcelService {
 		return config.stream().sorted().collect(Collectors.toList());
 	}
 
-	private SXSSFWorkbook multiSheetWorkbook(final List<List<ColumnConfig>> excelConfig,
-			final List<String> sheetNames) {
+	private SXSSFWorkbook multiSheetWorkbook(final List<List<ColumnConfig>> excelConfig, final List<String> sheetNames,
+			final SXSSFWorkbook workbook) {
 
 		if (excelConfig.size() != sheetNames.size()) {
 			throw new RuntimeException("The excel config size and sheet size are different");
 		}
 
-		SXSSFWorkbook sxssfWorkbook = ExcelUtil.createWorkbook();
+		SXSSFWorkbook sxssfWorkbook = workbook;
+		if (workbook == null) {
+			sxssfWorkbook = ExcelUtil.createWorkbook();
+		}
 
 		Map<String, SXSSFSheet> sheets = ExcelUtil.createSheets(sxssfWorkbook, sheetNames);
 
@@ -96,29 +99,40 @@ public class ExcelServiceImpl implements ExcelService {
 				});
 			});
 		}
-
 	}
 
-	public <T> Workbook getExcelSheet(final List<T> data, final Class<T> clazz, final String sheetName,
-			final String workbookName) {
-		SXSSFWorkbook workbook = generateExcel(data, clazz, sheetName, workbookName);
-		return workbook;
+	public SXSSFWorkbook generateWorkbook() {
+		return ExcelUtil.createWorkbook();
 	}
 
-	public <T> ResponseEntity<Resource> getExcelSheetAsResource(final List<T> data, final Class<T> clazz,
+	public <T> void generateMultiSheetExcel(final List<T> data, final Class<T> clazz, final String sheetName,
+			final Workbook book) {
+		SXSSFWorkbook workbook = (SXSSFWorkbook) book;
+		if (book == null) {
+			workbook = ExcelUtil.createWorkbook();
+		}
+		generateExcel(data, clazz, sheetName, workbook);
+	}
+
+	public <T> ResponseEntity<Resource> getSingleExcelSheetAsResource(final List<T> data, final Class<T> clazz,
 			final String sheetName, final String workbookName) {
-		SXSSFWorkbook workbook = generateExcel(data, clazz, sheetName, workbookName);
+		SXSSFWorkbook workbook = generateExcel(data, clazz, sheetName, null);
 		ByteArrayResource resource = ExcelUtil.writeWorkbookContents(workbook);
 		workbook.dispose();
 		return ok(resource, workbookName);
 	}
 
+	public <T> ResponseEntity<Resource> generateExcelResource(final Workbook workbook, final String name) {
+		ByteArrayResource resource = ExcelUtil.writeWorkbookContents(workbook);
+		return ok(resource, name);
+	}
+
 	private <T> SXSSFWorkbook generateExcel(final List<T> data, final Class<T> clazz, final String sheetName,
-			final String workbookName) {
+			final SXSSFWorkbook book) {
 		List<ColumnConfig> columnConfig = buildExcelConfig(clazz);
 
 		SXSSFWorkbook workbook = multiSheetWorkbook(Collections.singletonList(columnConfig),
-				Collections.singletonList(sheetName));
+				Collections.singletonList(sheetName), book);
 
 		writeContentToSheetUsingAnnotation(workbook, workbook.getSheet(sheetName), data, clazz, columnConfig, null);
 

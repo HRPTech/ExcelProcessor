@@ -23,7 +23,7 @@ public class TestExcelDownload {
 		personList.add(hiran);
 		personList.add(sheetal);
 		
-		ResponseEntity<Resource> resource = service.getExcelSheetAsResource(personList, Person.class, "Person sheet", "person workbook");
+		ResponseEntity<Resource> resource = service.getSingleExcelSheetAsResource(personList, Person.class, "Person sheet", "person workbook");
 		
 
 	}
